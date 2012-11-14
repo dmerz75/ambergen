@@ -2,14 +2,14 @@
 import sys, os, itertools, tempfile, shutil, glob, subprocess, re, pickle
 
 #___PROJECT__PREFIX__NAME:   *crdir*.dac130
-crdir='105.'
+crdir='amb105b.'
 
 #___MOLECULE___configurations_______
 mlist=['da','ee','el','le','oo']        # potentials--> to be generated
 molec=[mlist[0]]                        # can use [0],[1] ... [n]
 ts   ='2.0'                             # 0.5, 1.0, 2.0
 vels =['3']                             # ['1','3','4'] | ['4','5']
-x    ={'1':2,'2':2,'3':9,'4':4,'5':3}   # duplicates--> 03.00, 03.01, 03.02
+x    ={'1':2,'2':2,'3':14,'4':4,'5':3}  # duplicates--> 03.00, 03.01, 03.02
 environ=['01.vac','02.imp','03.exp']    # ['01.vac']  |  ['01.vac','03.exp']
 zcrd ='zc16'                            # z constraint  (smd.tcl)
 envdist={'01.vac':zcrd,'02.imp':zcrd,'03.exp':zcrd} # i.e. '01.vac':zc7...
