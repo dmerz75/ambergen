@@ -1,0 +1,9 @@
+namdgen
+author: Dale R. Merz Jr.
+email : dmerz3@gatech.edu
+
+description:
+ -steered molecular dynamics with AMBER
+ -obtaining the PMF stretching a peptide
+ -generates an array of directories designed for quick acquisition of 
+  a virtually unlimited number of trajectories
