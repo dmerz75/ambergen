@@ -2,7 +2,7 @@
 import sys, os, itertools, tempfile, shutil, glob, subprocess, re, pickle
 
 #___PROJECT__PREFIX__NAME:   *crdir*.dac130
-crdir='amb105b.'
+crdir='amb105c.'
 
 #___MOLECULE___configurations_______
 mlist=['da','ee','el','le','oo']        # potentials--> to be generated
@@ -135,6 +135,7 @@ def re_expavg(script,mol,env,v):
     text=re.sub('xxvelapsxx',velaps,text)
     velans=str((setup[v]['vel'])*500000)
     text=re.sub('xxvelansxx',velans,text)
+    text=re.sub('xxpfxx',str(dictpf[v]),text)
     plotn1=mol+'amb'+env.split('.')[1]+str(confige[v])
     plotn2=str(zlabel[envdist[env]])
     plotname=plotn1+plotn2
