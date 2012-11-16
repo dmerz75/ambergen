@@ -1,9 +1,22 @@
-namdgen
+ambergen
 author: Dale R. Merz Jr.
 email : dmerz3@gatech.edu
 
-description:
+AMBER Steered Molecular Dynamics
+
+quick description:
  -steered molecular dynamics with AMBER
  -obtaining the PMF stretching a peptide
+
+more details:
+ -take 1 peptide, with a .prmtop, .inpcrd (equilibrated), and smd.in (as template),
+  for any solvent conditions, vacuum, implicit, or explicit, and generate a
+  project directory, for exploring multiple pulling velocities, all from 
+  1 script
  -generates an array of directories designed for quick acquisition of 
   a virtually unlimited number of trajectories
+ 
+steps/commands:
+ 1) ./setup.py    # create the working directory
+ 2) upload the directory onto a cluster 
+ 3) ./run.py      # submits jobs to the PBS resource manager
