@@ -1,0 +1,32 @@
+steered molecular dynamics
+&cntrl
+nstlim=10000,
+dt=0.002,
+ntb=0,
+ntx=1,
+ntt=3,
+irest=0,
+ig=-1,
+cut=10.0, 
+igb=0, 
+saltcon=0.0,
+ntwe=1000,
+ntpr=1000, 
+ntwr=1000, 
+ntwx=1000,
+ntwv=-1,
+ioutfm=1,
+gamma_ln=5.0,
+ntc=2, 
+ntf=2, 
+tol=0.000001,
+tempi=300., 
+temp0=300.,
+jar=1
+/
+&wt type='DUMPFREQ', istep1=50, /
+&wt type='END', /
+DISANG=dist.RST
+DUMPAVE=tef.dat
+LISTIN=POUT
+LISTOUT=POUT
