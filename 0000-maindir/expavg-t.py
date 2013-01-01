@@ -41,7 +41,7 @@ domain=np.linspace(xmin,xmax,len(deltaf))
 rnd = np.random.RandomState(0x1913)
 indices = np.arange(data.shape[0])
 rnd.shuffle(indices)
-plot_indices = indices[1:64:1]
+plot_indices = indices[1:99:1]
 
 # PLOT - pmf
 fig=plt.figure()
@@ -68,6 +68,7 @@ plt.plot(t_plot,spline(t_plot),'k--',linewidth=1.5)
 plt.plot(domain[::xxpfxx], deltaf[::xxpfxx],'r-',linewidth=5)
 plt.plot(domain[::xxpfxx], deltaf[::xxpfxx],'k--',linewidth=0.6)
 
+'''
 # y
 miny=min(deltaf)
 maxy=deltaf[0.7*len(deltaf)]
@@ -82,6 +83,7 @@ plt.annotate('(%3.2f,%3.2f)' % (maxx,maxy),xy=(maxx,maxy),\
              xytext=(0,-60),textcoords='offset points',ha='center',va='bottom',\
              bbox=dict(boxstyle='round,pad=0.4', fc='cyan',alpha=0.5),\
              arrowprops=dict(arrowstyle='->',connectionstyle='arc3,rad=0'))
+'''
 
 plt.xlabel('Extension (A)')
 plt.ylabel('Work (kcal/mol)')
@@ -92,5 +94,5 @@ plt.xlim([xmin-.1,xmax+.1])
 
 plt.draw()
 #plt.show()
-fig.savefig('xxplotnamexx.png')
-fig.savefig('xxplotnamexx.eps')
+fig.savefig('xxplotnamexxea.png')
+fig.savefig('xxplotnamexxea.eps')

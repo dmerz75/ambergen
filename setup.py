@@ -1,28 +1,28 @@
 #!/usr/bin/env python
 import sys, os, itertools, tempfile, shutil, glob, subprocess, re, pickle
 
-#___PROJECT__PREFIX__NAME:   *crdir*.dac130
-crdir='amb105c.'
+#_____PREFIX_FOR_WORKING_DIRECTORY:   *crdir*.dac130
+crdir='prac.'
 
-#___MOLECULE___configurations_______
+#_____MOLECULE___configurations________________________________________________
 mlist=['da','ee','el','le','oo']        # potentials--> to be generated
 molec=[mlist[0]]                        # can use [0],[1] ... [n]
 ts   ='2.0'                             # 0.5, 1.0, 2.0
-vels =['3']                             # ['1','3','4'] | ['4','5']
-x    ={'1':2,'2':2,'3':14,'4':4,'5':3}  # duplicates--> 03.00, 03.01, 03.02
+vels =['1','2','3']                     # ['1','3','4'] | ['4','5']
+x    ={'1':2,'2':2,'3':2,'4':50,'5':3}  # duplicates--> 03.00, 03.01, 03.02
 environ=['01.vac','02.imp','03.exp']    # ['01.vac']  |  ['01.vac','03.exp']
 zcrd ='zc16'                            # z constraint  (smd.tcl)
 envdist={'01.vac':zcrd,'02.imp':zcrd,'03.exp':zcrd} # i.e. '01.vac':zc7...
 langevD='5'                             # langevin Damping: 0.2, 1, 5
 
-#___GATE_______configurations_______
-gate ='ggate'                           # 'ggate' or 'steele'
-cn   ='1'                               # ppn request
-comp ='cpu'                             # gpu or cpu        !TESLA: always 1
+#_____GATE_______configurations________________________________________________
+gate ='multisndr'                       # fgate,multisndr, #pmemd,steele
+cn   ='2'                               # ppn request
+comp ='cpu'                             # N/A-!gpu, cpu   !TESLA: always 1
 wallt='mwt'                             # swt=72 hrs, mwt=368 hrs, lwt=720 hrs
 queue='workq'                           # tg_ 'short'72 'workq'720 'standby-8'
 
-#_______<<<<<<   NO MORE CHANGES REQUIRED   >>>>>>____________________________
+#_______<<<<<<   NO MORE CHANGES REQUIRED   >>>>>>_____________________________
 zdictn ={'zc1': 10.0,'zc2': 10.2,'zc3': 10.4,'zc4': 10.6,'zc5': 10.8,
          'zc6': 11.0,'zc7': 11.2,'zc8': 11.4,'zc9': 11.6,'zc10':11.8,
          'zc11':12.0,'zc12':12.2,'zc13':12.4,'zc14':12.6,'zc15':12.8,
@@ -32,8 +32,10 @@ zlabel ={'zc1':'c100','zc2':'c102','zc3':'c104','zc4':'c106','zc5':'c108',
          'zc11':'c120','zc12':'c122','zc13':'c124','zc14':'c126','zc15':'c128',
          'zc16':'c130','zc17':'c132','zc18':'c134','zc19':'c136','zc20':'c138'}
 configf=['job.sh','go.py','smd.in','dist.RST','expavg.py']
-selgate={'ggate':{'job':'job-gg.sh','go':'go-g.py'},
-         'steele':{'job':'job-st.sh','go':'go-st.py'}}
+selgate={'fgate':{'job':'job-fgate.sh','go':'go-fgate.py'},
+         'multisndr':{'job':'job-multisndr.sh','go':'go-multisndr.py'},
+         'pmemd':{'job':'job-pmemd.sh','go':'go-pmemd.py'},
+         'steele':{'job':'job-steele.sh','go':'go-steele.py'}}
 confign={'1':{'gpu':'nodes=1:ppn=1:gpus=1:TESLA','cpu':'nodes=1:ppn=1'},
          '2':{'gpu':'nodes=1:ppn=2:gpus=1:TESLA','cpu':'nodes=1:ppn=2'},
          '3':{'gpu':'nodes=1:ppn=3:gpus=1:TESLA','cpu':'nodes=1:ppn=3'},
@@ -54,8 +56,8 @@ strdir ={'01.vac':'08.struc-equil.v','02.imp':'08.struc-equil.i',
 tstep  ={'0.5':0.5,'1.0':1.0,'2.0':2.0}
 dictpf ={'1':1,'2':1,'3':50,'4':100,'5':500}
 setup  ={'1':{'vel':0.002,'steps':10000,'dcd':100,'howmany':99,'freq':50},
-      '2':{'vel':0.0002,'steps':100000,'dcd':1000,'howmany':48,'freq':50},
-      '3':{'vel':0.00002,'steps':1000000,'dcd':10000,'howmany':30,
+      '2':{'vel':0.0002,'steps':100000,'dcd':1000,'howmany':34,'freq':50},
+      '3':{'vel':0.00002,'steps':1000000,'dcd':10000,'howmany':15,
                                                               'freq':50},
       '4':{'vel':0.000002,'steps':10000000,'dcd':100000,'howmany':3,
                                                               'freq':50},
@@ -176,6 +178,14 @@ def re_smd(script,mol,env,v):
     o=open(script,'w+')
     o.write(text)
     o.close()
+def re_hb(script,mol,env,v):
+    o=open(script,'r+')
+    text=o.read()
+    text=re.sub('xxenvironxx',strdir[env],text)
+    o.close()
+    o=open(script,'w+')
+    o.write(text)
+    o.close()
 #_____________________________________________________________________________
 def reg_exp(subdir,mol,env,v):                      # call regular expressions
     for root, dirnames, filenames, in os.walk(subdir):
@@ -196,6 +206,12 @@ def reg_exp(subdir,mol,env,v):                      # call regular expressions
                 re_expavg(fn,mol,env,v)
             elif id=='npy.py':
                 re_npy(fn,mol,env,v)
+            elif id=='hb_rgyr.py':
+                re_hb(fn,mol,env,v)
+            elif id=='allhb.py':
+                re_npy(fn,mol,env,v)
+            elif id=='ihbond.py':
+                re_npy(fn,mol,env,v)
 #________________________________________________________________________
 def copy_folder(subdir):                     # replicate in accord x dict
     ename=subdir+'/expavg.py'
@@ -210,6 +226,14 @@ def copy_folder(subdir):                     # replicate in accord x dict
     dualname=subdir+'/dualplot.py'
     dloc=('/').join(subdir.split('/')[:-1])
     dlocn=dloc+'/0'+num+'-dualplot.py'
+    os.system('mv %s %s' % (dualname,dlocn))
+    dualname=subdir+'/ihbond.py'
+    dloc=('/').join(subdir.split('/')[:-1])
+    dlocn=dloc+'/0'+num+'-ihbond.py'
+    os.system('mv %s %s' % (dualname,dlocn))
+    dualname=subdir+'/allhb.py'
+    dloc=('/').join(subdir.split('/')[:-1])
+    dlocn=dloc+'/0'+num+'-allhb.py'
     os.system('mv %s %s' % (dualname,dlocn))
     folder=subdir.split('/')[-1]
     copies=x[folder]
@@ -238,6 +262,15 @@ def make_folder(mol,env,zcrd):                        # make 5 velocities
         shutil.copy2(expfiles,expfiled)
         expfiles=os.path.join(maindir,'npy-t.py')
         expfiled=os.path.join(subdir,'npy.py')
+        shutil.copy2(expfiles,expfiled)
+        expfiles=os.path.join(maindir,'hb_rgyr-t.py')
+        expfiled=os.path.join(subdir,'hb_rgyr.py')
+        shutil.copy2(expfiles,expfiled)
+        expfiles=os.path.join(maindir,'allhb-t.py')
+        expfiled=os.path.join(subdir,'allhb.py')
+        shutil.copy2(expfiles,expfiled)
+        expfiles=os.path.join(maindir,'ihbond-t.py')
+        expfiled=os.path.join(subdir,'ihbond.py')
         shutil.copy2(expfiles,expfiled)
         expfiles=os.path.join(maindir,'dualplot-t.py')
         expfiled=os.path.join(subdir,'dualplot.py')
